@@ -28,7 +28,7 @@ io.on("connection", (socket) => {
   socket.on("report_player_progress", (data) => {
     let game = activeGames[data.gameId];
     game.participants[socket.id].progress = data.playerProgress;
-    game.participants[socket.id].wpm = data.wpm;
+    game.participants[socket.id].wordsTyped = data.wordsTyped;
     for (const id in activeGames[data.gameId].participants) {
       if (!(id == socket.id)) { //dont send update to user who reported progress
         io.to(id).emit('report_participant_progress', activeGames[data.gameId].participants);
@@ -45,7 +45,7 @@ io.on("connection", (socket) => {
 const scheduleGame = () => {
   let participants = {};
   queue.splice(0, 2).forEach((participant) => {
-    participants[participant.id] = {progress: 0, wpm: 0};
+    participants[participant.id] = {progress: 0, wordsTyped: 0};
   });
   let gameId = uuidv4();
   let gameStartTime = Date.now() + 5000;
