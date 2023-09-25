@@ -23,14 +23,10 @@ module.exports.io = io;
 io.on("connection", (socket) => {
   console.log("New connection id: " + socket.id);
   queue.push(socket);
-  if (queue.length >= 2) {
-    scheduleGame();
-  }
   socket.on("disconnect", () => {
     console.log("Connection destroyed id: " + socket.id);
     for(let i = 0; i < queue.length; i++){
       if(queue[i].id == socket.id){
-        console.log("splicing");
         queue.splice(i, 1);
       }
     }
@@ -55,9 +51,16 @@ io.on("connection", (socket) => {
   });
 });
 
+const scheduleGameInterval = setInterval(() => {
+  if(queue.length >= 2){
+    scheduleGame();
+  }
+}, 10000);
+
 const scheduleGame = () => {
   let participants = {};
-  queue.splice(0, 2).forEach((participant) => {
+  let participantsCount = Math.max(queue.length, 4);
+  queue.splice(0, participantsCount).forEach((participant) => {
     participants[participant.id] = {progress: 0, wordsTyped: 0};
   });
   let gameId = uuidv4();
