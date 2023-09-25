@@ -7,9 +7,11 @@ const io = require("socket.io")({
   }
 });
 
-let gamePrompts = ["You do not have to sit outside in the dark. If, however, you want to look at the stars, you will find that darkness is necessary. But the stars neither require nor demand it.",
+let gamePrompts = ["Test"];
+/*let gamePrompts = ["You do not have to sit outside in the dark. If, however, you want to look at the stars, you will find that darkness is necessary. But the stars neither require nor demand it.",
 "For all its apparent strength, the Aztec Empire had vulnerabilities that the Spanish were able to exploit. The tiny Spanish force was able to attract a massive army of some 30,000 Mesoamericans of many different tribes.",
 "Imagine this: Here we are, a plane full of grown human beings, many of us partially educated, and they're actually taking time out to describe the intricate workings of a belt buckle. Well, I ask for clarification at that point. Did you say 'Place the small metal flap into the buckle' or 'Place the buckle over and around the small metal flap'?"];
+*/
 const getRandomPrompt = () => {
   return gamePrompts[Math.floor(Math.random() * gamePrompts.length)];
 }
@@ -27,7 +29,8 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("Connection destroyed id: " + socket.id);
     for(let i = 0; i < queue.length; i++){
-      if(queue[i].id = socket.id){
+      if(queue[i].id == socket.id){
+        console.log("splicing");
         queue.splice(i, 1);
       }
     }
@@ -46,6 +49,9 @@ io.on("connection", (socket) => {
     let game = activeGames[data.gameId];
     game.podium.push(socket.id);
     io.to(socket.id).emit('report_player_result', game.podium.length);
+    if(game.podium.length == Object.keys(game.participants).length){ //game concluded
+      delete(activeGames[data.gameId]);
+    }
   });
 });
 
