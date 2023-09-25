@@ -7,6 +7,13 @@ const io = require("socket.io")({
   }
 });
 
+let gamePrompts = ["You do not have to sit outside in the dark. If, however, you want to look at the stars, you will find that darkness is necessary. But the stars neither require nor demand it.",
+"For all its apparent strength, the Aztec Empire had vulnerabilities that the Spanish were able to exploit. The tiny Spanish force was able to attract a massive army of some 30,000 Mesoamericans of many different tribes.",
+"Imagine this: Here we are, a plane full of grown human beings, many of us partially educated, and they're actually taking time out to describe the intricate workings of a belt buckle. Well, I ask for clarification at that point. Did you say 'Place the small metal flap into the buckle' or 'Place the buckle over and around the small metal flap'?"];
+const getRandomPrompt = () => {
+  return gamePrompts[Math.floor(Math.random() * gamePrompts.length)];
+}
+
 let queue = [];
 let activeGames = {};
 
@@ -49,8 +56,9 @@ const scheduleGame = () => {
   });
   let gameId = uuidv4();
   let gameStartTime = Date.now() + 5000;
-  activeGames[gameId] = { participants, gameStartTime, podium: [] };
+  let prompt = getRandomPrompt();
+  activeGames[gameId] = { prompt, participants, gameStartTime, podium: [] };
   for (const id in activeGames[gameId].participants) {
-    io.to(id).emit('schedule_online_game', { gameId, id, gameStartTime, participants: activeGames[gameId].participants});
+    io.to(id).emit('schedule_online_game', { gameId, id, prompt, gameStartTime, participants: activeGames[gameId].participants});
   }
 }
